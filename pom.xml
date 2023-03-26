@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.dogton.wechat</groupId>
-    <artifactId>ChatGPT-Bot</artifactId>
+    <artifactId>ChatGPT-Bot-OfficialAccount</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ChatGPT-Bot</name>
+    <name>ChatGPT-Bot-OfficialAccount</name>
     <description>A ChatGPT Bot based on Wechat.</description>
     <properties>
         <java.version>8</java.version>

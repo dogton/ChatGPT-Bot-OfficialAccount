@@ -53,9 +53,4 @@ public class WxMessageController {
         }
     }
 
-    @GetMapping("test")
-    public String test(String user, String prompt) {
-        return chatGPTService.reply(user, prompt);
-    }
-
 }
