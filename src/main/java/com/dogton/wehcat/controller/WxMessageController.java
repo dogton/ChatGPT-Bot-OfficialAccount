@@ -14,19 +14,18 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/wechat")
+@RequestMapping("/wechat/${wxToken}/${openApiKey}")
 public class WxMessageController {
 
     private final static Logger log = LoggerFactory.getLogger(WxMessageController.class);
-
-    @Value("${wechatToken}")
-    private String wxToken;
 
     @Autowired
     private ChatGPTService chatGPTService;
 
     @GetMapping
-    public String validate(@RequestParam(value = "signature", required = false) String signature,
+    public String validate(@PathVariable() String wxToken,
+                           @PathVariable() String openApiKey,
+                           @RequestParam(value = "signature", required = false) String signature,
                            @RequestParam(value = "timestamp", required = false) String timestamp,
                            @RequestParam(value = "nonce", required = false) String nonce,
                            @RequestParam(value = "echostr", required = false) String echostr) {
@@ -37,7 +36,9 @@ public class WxMessageController {
     }
 
     @PostMapping
-    public String reply(HttpServletRequest request) {
+    public String reply(@PathVariable() String wxToken,
+                        @PathVariable() String openApiKey,
+                        HttpServletRequest request) {
         String signature = request.getParameter("signature");
         String timestamp = request.getParameter("timestamp");
         String nonce = request.getParameter("nonce");
@@ -45,17 +46,12 @@ public class WxMessageController {
         if (WeChatMessageHelper.validate(wxToken, signature, timestamp, nonce)) {
             Map<String, String> xml = WeChatMessageHelper.parseXml(request);
             TextMessage message = MessageFormatUtil.parseMessage(xml);
-            String replyMsg = chatGPTService.reply(message.getFromUserName(), message.getContent());
+            String replyMsg = chatGPTService.reply(openApiKey, message.getFromUserName(), message.getContent());
             log.info("Receive TextMessage: {}, Reply: {}", message, replyMsg);
             return MessageFormatUtil.replay(message.setReplyMsg(replyMsg));
         } else {
             return "error";
         }
-    }
-
-    @GetMapping("test")
-    public String test(String user, String prompt) {
-        return chatGPTService.reply(user, prompt);
     }
 
 }

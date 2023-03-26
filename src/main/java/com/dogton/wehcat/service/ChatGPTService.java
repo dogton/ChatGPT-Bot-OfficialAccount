@@ -28,9 +28,6 @@ public class ChatGPTService {
 
     private static final Logger log = LoggerFactory.getLogger(ChatGPTService.class);
 
-    @Value("${openApiKey:}")
-    private String openApiKey;
-
     @Value("${model:}")
     private String model;
 
@@ -47,8 +44,9 @@ public class ChatGPTService {
 
     private Multimap<String, ChatMessage> messageMultimap = ArrayListMultimap.create();
 
-    public String reply(String user, String prompt) {
+    public String reply(String openApiKey, String user, String prompt) {
         try {
+            OpenAiService openAiService = new OpenAiService(openApiKey)
             messageMultimap.put(user, new ChatMessage("user", prompt));
             ChatCompletionRequest request = ChatCompletionRequest.builder()
                     .model(model)
@@ -58,27 +56,6 @@ public class ChatGPTService {
         } catch (Throwable e) {
             log.error("Get ChatGPT Message Error! user:{} prompt: {}", user, prompt, e);
             return errorTips;
-        }
-    }
-
-    @Autowired
-    public void setOpenAiService() {
-        if (StringUtils.hasText(proxyTarget)) {
-            String[] hostPort = proxyTarget.split(":");
-            if (hostPort.length != 2) {
-                throw new RuntimeException("代理地址配置异常, 请调整配置!");
-            }
-            ObjectMapper mapper = defaultObjectMapper();
-            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(hostPort[0], Integer.parseInt(hostPort[1])));
-            OkHttpClient client = defaultClient(openApiKey, Duration.ofMillis(timeout))
-                    .newBuilder()
-                    .proxy(proxy)
-                    .build();
-            Retrofit retrofit = defaultRetrofit(client, mapper);
-            OpenAiApi api = retrofit.create(OpenAiApi.class);
-            this.openAiService = new OpenAiService(api);
-        } else {
-            this.openAiService = new OpenAiService(openApiKey);
         }
     }
 }
