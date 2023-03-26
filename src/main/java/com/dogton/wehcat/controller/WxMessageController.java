@@ -19,7 +19,7 @@ public class WxMessageController {
 
     private final static Logger log = LoggerFactory.getLogger(WxMessageController.class);
 
-    @Value("${wxToken}")
+    @Value("${wechatToken}")
     private String wxToken;
 
     @Autowired
@@ -51,6 +51,11 @@ public class WxMessageController {
         } else {
             return "error";
         }
+    }
+
+    @GetMapping("test")
+    public String test(String user, String prompt) {
+        return chatGPTService.reply(user, prompt);
     }
 
 }
