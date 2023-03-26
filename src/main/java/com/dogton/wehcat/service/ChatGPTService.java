@@ -18,7 +18,7 @@ public class ChatGPTService {
     private static final Logger log = LoggerFactory.getLogger(ChatGPTService.class);
 
     @Value("${openApiKey:}")
-    private String openApiKey = System.getenv("API_KEY");
+    private String openApiKey;
 
     @Value("${model}")
     private String model;
